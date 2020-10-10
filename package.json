@@ -1,6 +1,6 @@
 {
   "name": "dice-roller",
-  "homepage": "http://3.10.118.64/",
+  "homepage": "https://tmnrwd.github.io/dice-roller/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,6 +8,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "flexbox-react": "^4.4.0",
+    "gh-pages": "^3.1.0",
     "react": "^16.13.1",
     "react-bootstrap": "^1.3.0",
     "react-dom": "^16.13.1",
@@ -18,6 +19,8 @@
     "uuidv4": "^6.2.4"
   },
   "scripts": {
+     "predeploy": "npm run build",
+     "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
