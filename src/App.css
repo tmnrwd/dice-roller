@@ -1,0 +1,76 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.buttons {
+  height: 50px;
+  width: 80px;
+}
+
+.sticky-column {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0
+}
+
+.history-container {
+  border: 1px solid #eeccee;
+  min-height: 400px;
+  max-height: 400px;
+  overflow-y: scroll;
+  width: 100%;
+}
+
+.rolls-container {
+  min-height: 300px;
+  max-height: 300px;
+  min-width: 200px;
+  overflow-y: scroll;
+  width: 100%;
+}
+
+.saved-rolls-container {
+  table-layout: fixed;
+  overflow-wrap: break-word;
+  min-height: 300px;
+  max-height: 300px;
+  width: 300px;
+  overflow-y: scroll;
+  width: 100%;
+}
+
+td{
+  width: 110px;
+  max-width: 110px;
+  min-width: 110px;
+}
+
+.wide-td{
+  min-width: 300px;
+}
