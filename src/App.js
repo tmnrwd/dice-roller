@@ -8,6 +8,7 @@ import Row from 'react-bootstrap/Row';
 import { v4 as uuidv4 } from 'uuid';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+let historyID = 1;
 
 class App extends React.Component {
 constructor(props){
@@ -24,7 +25,7 @@ constructor(props){
     addDie: 2,
     modifier: 0,
     diceRolled: 1,
-    history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": Date.now()}],
+    history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": 0}],
     savedRolls: [{"saveDiceRolled": 6, "sides": 4, "modifier": 4, "label": "Test Roll"}],
     saveLabel: "",
     saveDiceRolled: 1,
@@ -84,6 +85,14 @@ getRandomInt(max) {
   return firstStep
 }
 
+searchHistory(){
+  for (let i=0; i < this.state.history.length; i++) {
+      if (this.state.history[i].key === historyID) {
+          historyID++;
+      }
+  }
+}
+
 diceRoll = (event, max, diceRolled, mod, advantage, disadvantage) => {
   event.preventDefault();
   if (!diceRolled) { diceRolled = this.state.diceRolled;}
@@ -135,13 +144,15 @@ diceRoll = (event, max, diceRolled, mod, advantage, disadvantage) => {
       ({arrayString} - {posMod} )
         </div>);
   }
-  let latestRoll = { "max": max, "result": result, "mod": mod, "diceRolled": diceRolled, "rolledArrayString": arrayString, "key": Date.now(), };
+  let latestRoll = { "max": max, "result": result, "mod": mod, "diceRolled": diceRolled, "rolledArrayString": arrayString };
   if (advantage||disadvantage) { 
   let arrayString = advHistoryArray.join("; ");
     latestRoll.advantageRolls = arrayString;
     if (advantage){latestRoll.advantage = "advantage";}
     if (disadvantage){latestRoll.advantage = "disadvantage";}
   }
+  this.searchHistory();
+  latestRoll.key = historyID;
   this.setState({
     history: [...this.state.history, latestRoll]
   })
@@ -212,6 +223,7 @@ showHistory() {
   <Table key={current.key}>
     <tbody>
   <tr>
+  <td>ID: {current.key}</td>
     <td>{current.diceRolled}d{current.max} roll:</td>
     <td>{current.result}</td>
     <td className="wide-td">({current.rolledArrayString} + {current.mod})</td>
