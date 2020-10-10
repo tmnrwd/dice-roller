@@ -26,7 +26,8 @@ constructor(props){
     modifier: 0,
     diceRolled: 1,
     history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": 0}],
-    savedRolls: [{"saveDiceRolled": 6, "sides": 4, "modifier": 4, "label": "Test Roll"}],
+    savedRolls: [{"saveDiceRolled": 2, "sides": 4, "modifier": 2, "label": "Healing Potion"},
+                 {"saveDiceRolled": 1, "sides": 20, "modifier": 5, "label": "Attack", "advantage": "advantage"}],
     saveLabel: "",
     saveDiceRolled: 1,
     saveRollSides: 2,
@@ -93,7 +94,7 @@ searchHistory(){
   }
 }
 
-diceRoll = (event, max, diceRolled, mod, advantage, disadvantage) => {
+diceRoll = (event, max, diceRolled, mod, advantage, label, disadvantage) => {
   event.preventDefault();
   if (!diceRolled) { diceRolled = this.state.diceRolled;}
   if (!mod) {
@@ -135,13 +136,15 @@ diceRoll = (event, max, diceRolled, mod, advantage, disadvantage) => {
   if (mod > -1) {
   toast(<div>{diceRolled}d{max} result: {result}
   <br/>
-  ({arrayString} + {mod})
+  ({arrayString} + {mod})<br/>
+  { advantage && !disadvantage ? ` Advantage rolls: ${roll3}, ${roll4}` : `` } { advantage && disadvantage ? ` Advantage rolls: ${roll3}, ${roll4}` : `` } { disadvantage && !advantage ? `Disadvantage rolls: ${roll3}, ${roll4}` : `` }
     </div>);
   } else {
     let posMod = Math.abs(mod);
     toast(<div>{diceRolled}d{max} result: {result}
       <br/>
-      ({arrayString} - {posMod} )
+      ({arrayString} - {posMod} )<br/>
+      { advantage && !disadvantage ? ` Advantage rolls: ${roll3}, ${roll4}` : `` } { advantage && disadvantage ? ` Advantage rolls: ${roll3}, ${roll4}` : `` } { disadvantage && !advantage ? `Disadvantage rolls: ${roll3}, ${roll4}` : `` }
         </div>);
   }
   let latestRoll = { "max": max, "result": result, "mod": mod, "diceRolled": diceRolled, "rolledArrayString": arrayString };
@@ -151,10 +154,15 @@ diceRoll = (event, max, diceRolled, mod, advantage, disadvantage) => {
     if (advantage){latestRoll.advantage = "advantage";}
     if (disadvantage){latestRoll.advantage = "disadvantage";}
   }
+  if (label){
+    latestRoll.label = label;
+  }
   this.searchHistory();
   latestRoll.key = historyID;
+  let newHistory = [...this.state.history, latestRoll];
+  let newHistory2 = newHistory.sort((a, b) => a.key - b.key);
   this.setState({
-    history: [...this.state.history, latestRoll]
+    history: newHistory2
   })
   this.scrollToTop();
 }
@@ -207,12 +215,14 @@ deleteRoll = (event, current) => {
 renderDice() {
   return this.state.dice.map((current) =>
   <>
-  <tbody  key={current.key}>
+  <Table key={current.key}>
+  <tbody className="text-center">
       <tr>
       <td><button className="buttons" onClick={(event) => this.diceRoll(event, current.sides, current.diceRolled, )}>{current.diceRolled}d{current.sides}</button></td>
       <td><button className="buttons" onClick={(event) => this.deleteDie(event, current)}>Remove</button></td>
       </tr>
       </tbody>
+    </Table>
   </>
   )
 }
@@ -220,10 +230,10 @@ renderDice() {
 showHistory() {
   return this.state.history.reverse().map((current) =>
   <>
-  <Table key={current.key}>
+  <Table key={this.state.history.findIndex(item => item.key === current.key)}>
     <tbody>
   <tr>
-  <td>ID: {current.key}</td>
+  <td>{current.label}</td>
     <td>{current.diceRolled}d{current.max} roll:</td>
     <td>{current.result}</td>
     <td className="wide-td">({current.rolledArrayString} + {current.mod})</td>
@@ -245,12 +255,12 @@ showSavedRolls() {
   return this.state.savedRolls.map((current) =>
   <>
   <Table key={current.key} >
-  <tbody className="fixed-width-columns">
+  <tbody className="fixed-width-columns text-center">
 <tr>
-      <td colSpan="2" >{current.label}</td>
-      <td ><button  className="buttons" onClick={(event) => this.diceRoll(event, current.sides, current.saveDiceRolled, current.modifier, current.advantage)}>{current.saveDiceRolled}d{current.sides} + {current.modifier}</button></td>
+      <td >{current.label}</td>
+      <td ><button  className="buttons" onClick={(event) => this.diceRoll(event, current.sides, current.saveDiceRolled, current.modifier, current.advantage, current.label)}>{current.saveDiceRolled}d{current.sides} + {current.modifier}</button></td>
+      <td >{current.advantage ? "Advantage" : <i>       </i>} {current.disadvantage ? "Disadvantage" : <i>       </i>}</td>
       <td><button  className="buttons" onClick={(event) => this.deleteRoll(event, current)}>Remove</button></td>
-      <td width="100">{current.advantage ? "Advantage" : <i>       </i>} {current.disadvantage ? "Disadvantage" : <i>       </i>}</td>
       </tr>
       </tbody>
       </Table>
@@ -288,7 +298,7 @@ render () {
       <ToastContainer />
       <Container>
       <Row>
-      <Col>
+      <Col xs={4}>
 
       <Table bordered>
         <thead>
@@ -303,15 +313,18 @@ render () {
 
       <Form>
       <label>
+      <br/>Modifier: <br/>
+          <input type="number" name="modifier" step="1" value={this.state.modifier} onChange={(e) => this.handleChange(e)} />
+          <br/>Advantage: <input type="checkbox" name="advantage" value={this.state.advantage} onChange={(e) => this.handleChange(e)} />
+          <br/>Disadvantage: <input type="checkbox" name="disadvantage" value={this.state.disadvantage} onChange={(e) => this.handleChange(e)} />
+          <hr/>
       <u>Add Custom Die</u>
           <br/>Number of dice to roll: <br/>
           <input type="number" name="diceRolled" step="1" value={this.state.diceRolled} onChange={(e) => this.handleChange(e)} />
-          <br/>Modifier: <br/>
-          <input type="number" name="modifier" step="1" value={this.state.modifier} onChange={(e) => this.handleChange(e)} />
+          
           <br/>Custom die sides:<br/>
           <input type="number" name="addDie" min="1" step="1" value={this.state.addDie} onChange={(e) => this.handleChange(e)} />
-          <br/>Advantage: <input type="checkbox" name="advantage" value={this.state.advantage} onChange={(e) => this.handleChange(e)} />
-          <br/>Disadvantage: <input type="checkbox" name="disadvantage" value={this.state.disadvantage} onChange={(e) => this.handleChange(e)} />
+          
         </label>
         <br/>
         <input type="button" onClick={this.pushDie} value="Add Custom Die"/>
@@ -369,13 +382,15 @@ render () {
       </Table>
       <Form>
       <label>
-        <u>Save and Delete</u>
           <br/><br/>
         <input type="button" onClick={this.saveStateToLocalStorage} value="Save rolls, dice, and history" />
+        <br/>If you save your custom dice, custom rolls, and roll history, they will be here when you come back to this page. Otherwise, you'll start afresh. 
         <br/><br/>
         <input type="button" onClick={this.resetHistory} value="Reset History" />
+        <br/>This button resets the roll history to its original state.
         <br/><br/>
         <input type="button" onClick={this.clearLocalStorage} value="Reset to Default" />
+        <br/>This button resets your custom dice, custom rolls, and roll history to their original states.
         </label>
         </Form>
  
