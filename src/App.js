@@ -25,7 +25,7 @@ constructor(props){
     addDie: 2,
     modifier: 0,
     diceRolled: 1,
-    history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": 0}],
+    history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": 0, "label": "My d20 Roll"}],
     savedRolls: [{"saveDiceRolled": 2, "sides": 4, "modifier": 2, "label": "Healing Potion"},
                  {"saveDiceRolled": 1, "sides": 20, "modifier": 5, "label": "Attack", "advantage": "advantage"}],
     saveLabel: "",
@@ -296,9 +296,9 @@ render () {
     <>
       <Container fluid>
       <ToastContainer />
-      <Container>
+      <Container size="sm">
       <Row>
-      <Col xs={4}>
+      <Col xs={12} s={12} md={4}>
 
       <Table bordered>
         <thead>
@@ -334,7 +334,7 @@ render () {
         
       </Col>
 
-      <Col>
+      <Col xs={12} s={12} md={8}>
 
       <Table bordered>
         <thead>
@@ -368,7 +368,7 @@ render () {
       </Row>
 
       <Row>
-      <Col>
+      <Col xs={12}>
       <Table bordered>
         <thead>
           <tr>

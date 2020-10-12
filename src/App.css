@@ -33,6 +33,10 @@
   width: 80px;
 }
 
+.container {
+  max-width: 100%;
+}
+
 .sticky-column {
   position: -webkit-sticky; /* Safari */
   position: sticky;
@@ -41,36 +45,32 @@
 
 .history-container {
   border: 1px solid #eeccee;
-  min-height: 400px;
-  max-height: 400px;
+  overflow-wrap: break-word;
+  height: 400px;
   overflow-y: scroll;
-  width: 100%;
+  resize: vertical;
 }
 
 .rolls-container {
-  min-height: 300px;
-  max-height: 300px;
-  min-width: 100px;
+  height: 300px;
+
   overflow-y: scroll;
-  width: 100%;
+  resize: vertical;
 }
 
 .saved-rolls-container {
   table-layout: fixed;
   overflow-wrap: break-word;
-  min-height: 300px;
-  max-height: 300px;
-  width: 300px;
+  height: 300px;
   overflow-y: scroll;
-  width: 100%;
+  resize: vertical;
 }
 
 td{
-  width: 110px;
-  max-width: 110px;
-  min-width: 110px;
+  width: 100px;
+
 }
 
 .wide-td{
-  min-width: 300px;
+  width: 100px;
 }
