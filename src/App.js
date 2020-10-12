@@ -25,7 +25,7 @@ constructor(props){
     addDie: 2,
     modifier: 0,
     diceRolled: 1,
-    history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": 0, "label": "My d20 Roll"}],
+    history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": 0, "label": "My d20 Roll", advantage: "advantage", advantageRolls: "1, 1"}],
     savedRolls: [{"saveDiceRolled": 2, "sides": 4, "modifier": 2, "label": "Healing Potion"},
                  {"saveDiceRolled": 1, "sides": 20, "modifier": 5, "label": "Attack", "advantage": "advantage"}],
     saveLabel: "",
@@ -233,11 +233,11 @@ showHistory() {
   <Table key={this.state.history.findIndex(item => item.key === current.key)}>
     <tbody>
   <tr>
-  <td>{current.label}</td>
-    <td>{current.diceRolled}d{current.max} roll:</td>
-    <td>{current.result}</td>
-    <td className="wide-td">({current.rolledArrayString} + {current.mod})</td>
-    <td className="wide-td">{current.advantage === "advantage" ? `Advantage rolls: ${current.advantageRolls}` : ""} {current.advantage === "disadvantage" ? `Disadvantage rolls: ${current.advantageRolls}` : ""}</td>
+    <td >{current.label}</td>
+    <td className="td-small">{current.diceRolled}d{current.max}</td>
+    <td className="td-small">{current.result}</td>
+    <td >({current.rolledArrayString} + {current.mod})</td>
+    <td >{current.advantage === "advantage" ? `Advantage rolls: ${current.advantageRolls}` : ""} {current.advantage === "disadvantage" ? `Disadvantage rolls: ${current.advantageRolls}` : ""}</td>
   </tr>
   </tbody>
   </Table>
@@ -296,9 +296,9 @@ render () {
     <>
       <Container fluid>
       <ToastContainer />
-      <Container size="sm">
+      <Container>
       <Row>
-      <Col xs={12} s={12} md={4}>
+      <Col >
 
       <Table bordered>
         <thead>
@@ -334,7 +334,7 @@ render () {
         
       </Col>
 
-      <Col xs={12} s={12} md={8}>
+      <Col>
 
       <Table bordered>
         <thead>
@@ -365,10 +365,8 @@ render () {
         </Form>
         <br/>
       </Col>
-      </Row>
-
-      <Row>
-      <Col xs={12}>
+     
+      <Col >
       <Table bordered>
         <thead>
           <tr>

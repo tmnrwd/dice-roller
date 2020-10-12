@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  margin: 0;
 }
 
 .App-logo {
@@ -45,32 +46,32 @@
 
 .history-container {
   border: 1px solid #eeccee;
-  overflow-wrap: break-word;
-  height: 400px;
+  height: 300px;
   overflow-y: scroll;
   resize: vertical;
+  word-wrap: break-word;
 }
 
 .rolls-container {
   height: 300px;
-
   overflow-y: scroll;
   resize: vertical;
 }
 
 .saved-rolls-container {
   table-layout: fixed;
-  overflow-wrap: break-word;
+  word-wrap: break-word;
   height: 300px;
   overflow-y: scroll;
   resize: vertical;
 }
 
 td{
-  width: 100px;
-
+  min-width: 100px;
+  max-width: 100px;
 }
 
-.wide-td{
-  width: 100px;
+.td-small{
+  min-width:50px;
+  max-width:50px;
 }
