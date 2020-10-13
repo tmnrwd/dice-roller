@@ -1,5 +1,6 @@
 import React from 'react'
 import { ToastContainer, toast } from 'react-toastify';
+import ReactToolTip from 'react-tooltip';
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
@@ -9,12 +10,14 @@ import { v4 as uuidv4 } from 'uuid';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 let historyID = 1;
+let character = [0];
 
 class App extends React.Component {
 constructor(props){
   super(props)
   this.historyRef = React.createRef();
   this.state = {
+   character: "default",
     dice: [{sides: 4, diceRolled: 1, key: uuidv4()},
       {sides: 6, diceRolled: 1, key: uuidv4()},
       {sides: 8, diceRolled: 1, key: uuidv4()},
@@ -27,7 +30,9 @@ constructor(props){
     diceRolled: 1,
     history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": 0, "label": "My d20 Roll", advantage: "advantage", advantageRolls: "1, 1"}],
     savedRolls: [{"saveDiceRolled": 2, "sides": 4, "modifier": 2, "label": "Healing Potion"},
-                 {"saveDiceRolled": 1, "sides": 20, "modifier": 5, "label": "Attack", "advantage": "advantage"}],
+                 {"saveDiceRolled": 1, "sides": 20, "modifier": 5, "label": "Attack", "advantage": "advantage"},
+                 {"saveDiceRolled": 10, "sides": 4, "modifier": 0, "label": "Reroll 1s", "advantage": "", reroll: 1,}],
+    label:"",
     saveLabel: "",
     saveDiceRolled: 1,
     saveRollSides: 2,
@@ -36,11 +41,16 @@ constructor(props){
     saveRollAdvantage: false,
     disadvantage: false,
     saveRollDisadvantage: false,
-  }
+    explode: false,
+    saveRollExplode: false,
+    reroll: 0,
+    saveRollReroll: 0,
+}
 }
 
 componentDidMount() {
     this.setStateFromLocalStorage();
+    this.resetCheckBoxes();
 }
 
 saveStateToLocalStorage = () => {
@@ -62,17 +72,82 @@ setStateFromLocalStorage = () => {
       }
     }
   }
+}
+
+resetCheckBoxes = () => {
   this.setState({
     advantage: false,
     saveRollAdvantage: false,
     disadvantage: false,
     saveRollDisadvantage: false,
+    explode: false,
+    saveRollExplode: false,
+    reroll: 0,
+    saveRollReroll: 0,
   })
 }
+/*
+resetCheckBoxesCharSwitch = (prevState) => {
+  let charCopy = Object.assign({}, prevState.characters[charIndex]);
+  charCopy.advantage = false;
+  charCopy.saveRollAdvantage = false;
+  charCopy.disadvantage = false;
+  charCopy.saveRollDisadvantage = false;
+  charCopy.explode = false;
+  charCopy.saveRollExplode = false;
+  charCopy.reroll = 0;
+  charCopy.saveRollReroll = 0;
+  this.setState({
+    
+  })
+}
+*/
 
 clearLocalStorage = () =>{
   localStorage.clear();
   window.location.reload();
+}
+
+addCharacter = (name) => {
+  let newCharacter = { character: name,
+  dice: [{sides: 4, diceRolled: 1, key: uuidv4()},
+    {sides: 6, diceRolled: 1, key: uuidv4()},
+    {sides: 8, diceRolled: 1, key: uuidv4()},
+    {sides: 10, diceRolled: 1, key: uuidv4()},
+    {sides: 12, diceRolled: 1, key: uuidv4()},
+    {sides: 20, diceRolled: 1, key: uuidv4()},
+    {sides: 100, diceRolled: 1, key: uuidv4()},],
+  addDie: 2,
+  modifier: 0,
+  diceRolled: 1,
+  history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": 0, "label": "My d20 Roll", advantage: "advantage", advantageRolls: "1, 1"}],
+  savedRolls: [{"saveDiceRolled": 2, "sides": 4, "modifier": 2, "label": "Healing Potion"},
+               {"saveDiceRolled": 1, "sides": 20, "modifier": 5, "label": "Attack", "advantage": "advantage"},
+               {"saveDiceRolled": 10, "sides": 4, "modifier": 0, "label": "Reroll 1s", "advantage": "", reroll: 1,}],
+  saveLabel: "",
+  saveDiceRolled: 1,
+  saveRollSides: 2,
+  saveRollModifier: 0,
+  advantage: false,
+  saveRollAdvantage: false,
+  disadvantage: false,
+  saveRollDisadvantage: false,
+  explode: false,
+  saveRollExplode: false,
+  reroll: 0,
+  saveRollReroll: 0,
+  }
+  this.setState({
+    characters: [...this.state.characters, newCharacter]
+  })
+}
+
+setCharacter = (name) =>
+{
+for(let i = 0; i < this.state.characters.length; i++)
+ if(this.state.characters[i].character === name) {
+ character = this.state.characters[i];
+}
 }
 
 resetHistory = () =>{
@@ -94,7 +169,7 @@ searchHistory(){
   }
 }
 
-diceRoll = (event, max, diceRolled, mod, advantage, label, disadvantage) => {
+diceRoll = (event, max, diceRolled, mod, advantage, label, explode, reroll, disadvantage,) => {
   event.preventDefault();
   if (!diceRolled) { diceRolled = this.state.diceRolled;}
   if (!mod) {
@@ -102,6 +177,8 @@ diceRoll = (event, max, diceRolled, mod, advantage, label, disadvantage) => {
   }
   if (!advantage) { advantage = this.state.advantage }
   if (!disadvantage) { disadvantage = this.state.disadvantage }
+  if (!explode) { explode = this.state.explode }
+  if (!reroll) { reroll = this.state.reroll }
   let diceRolledArray = [];
   let roll1;
   let roll2;
@@ -126,9 +203,18 @@ diceRoll = (event, max, diceRolled, mod, advantage, label, disadvantage) => {
           } else {
             roll3 = roll1; roll4 = roll2;
           }
+          console.log("before reroll: ", roll3)
+      if (roll3 <= reroll)
+      { 
+        roll3 = this.getRandomInt(max); 
+      }
+      console.log("after reroll: ", roll3)
       diceRolledArray.push(roll3);
       advHistoryArray.push(` ${roll3}, ${roll4}`);
       i++;
+      if (explode === true && roll3 === max) {
+        i--;
+      }
   }
   let arrayTotal = diceRolledArray.reduce((a,b) => (a + b));
   let result = parseInt(arrayTotal) + parseInt(mod);
@@ -194,11 +280,14 @@ saveRoll = () => {
       "modifier": this.state.saveRollModifier,
       "advantage": this.state.saveRollAdvantage,
       "disadvantage": this.state.saveRollDisadvantage,
+      "explode": this.state.saveRollExplode,
       "label": this.state.saveLabel,
+      reroll: this.state.saveRollReroll,
       "key": Date.now(),
     }],
-    addDie: 2,
+    //addDie: 2,
     saveLabel: "",
+    saveRollReroll: 0,
   })
   //console.log(this.state.savedRolls)
 }
@@ -218,7 +307,7 @@ renderDice() {
   <Table key={current.key}>
   <tbody className="text-center">
       <tr>
-      <td><button className="buttons" onClick={(event) => this.diceRoll(event, current.sides, current.diceRolled, )}>{current.diceRolled}d{current.sides}</button></td>
+      <td><button className="buttons" onClick={(event) => this.diceRoll(event, current.sides, current.diceRolled, this.state.modifier, this.state.advantage, this.state.label, this.state.explode, this.state.reroll, this.state.disadvantage,)}>{current.diceRolled}d{current.sides}</button></td>
       <td><button className="buttons" onClick={(event) => this.deleteDie(event, current)}>Remove</button></td>
       </tr>
       </tbody>
@@ -258,8 +347,8 @@ showSavedRolls() {
   <tbody className="fixed-width-columns text-center">
 <tr>
       <td >{current.label}</td>
-      <td ><button  className="buttons" onClick={(event) => this.diceRoll(event, current.sides, current.saveDiceRolled, current.modifier, current.advantage, current.label)}>{current.saveDiceRolled}d{current.sides} + {current.modifier}</button></td>
-      <td >{current.advantage ? "Advantage" : <i>       </i>} {current.disadvantage ? "Disadvantage" : <i>       </i>}</td>
+      <td ><button  className="buttons" onClick={(event) => this.diceRoll(event, current.sides, current.saveDiceRolled, current.modifier, current.advantage, current.label, current.explode, current.reroll)}>{current.saveDiceRolled}d{current.sides} + {current.modifier}</button></td>
+      <td >{current.advantage ? "Advantage" : <i>       </i>} {current.disadvantage ? "Disadvantage" : <i>       </i>} {current.explode ? "Explode" : <i>       </i>}</td>
       <td><button  className="buttons" onClick={(event) => this.deleteRoll(event, current)}>Remove</button></td>
       </tr>
       </tbody>
@@ -270,15 +359,20 @@ showSavedRolls() {
 
 handleChange = (event) => {
   const newState = {};
-  if (event.target.name === 'advantage'){
-    //console.log("trig if, advantage in state is: ", this.state.advantage);
-    newState[event.target.name] = !this.state.advantage
-    //console.log("after if, advantage in state is: ", this.state.advantage)
-}
-else if (event.target.name === 'saveRollAdvantage'){
-  //console.log("trig if, saveRollAdvantage in state is: ", this.state.saveRollAdvantage);
-  newState[event.target.name] = !this.state.saveRollAdvantage
-  //console.log("after if, saveRollAdvantage in state is: ", this.state.saveRollAdvantage)
+if (event.target.name === 'advantage' || 
+event.target.name === 'disadvantage' || 
+event.target.name === 'explode' || 
+event.target.name === 'saveRollAdvantage' ||
+event.target.name === 'saveRollDisadvantage' ||
+event.target.name === 'saveRollExplode'
+){
+    //console.log("trig if, advantage in state is: ", this.state.saveRollAdvantage);    
+    //console.log("trig if, disadvantage in state is: ", this.state.saveRollDisadvantage);
+    //console.log("trig if, explode in state is: ", this.state.saveRollExplode);
+    newState[event.target.name] = !this.state[event.target.name];
+    //console.log("trig if, advantage in state is: ", this.state.saveRollAdvantage);    
+    //console.log("trig if, disadvantage in state is: ", this.state.saveRollDisadvantage);
+    //console.log("trig if, explode in state is: ", this.state.saveRollExplode);
 }
 else { newState[event.target.name] = event.target.value }
   this.setState(newState)
@@ -313,10 +407,23 @@ render () {
 
       <Form>
       <label>
-      <br/>Modifier: <br/>
+      <u>Roll Options</u>
+        <br/>Modifier: <br/>
           <input type="number" name="modifier" step="1" value={this.state.modifier} onChange={(e) => this.handleChange(e)} />
-          <br/>Advantage: <input type="checkbox" name="advantage" value={this.state.advantage} onChange={(e) => this.handleChange(e)} />
-          <br/>Disadvantage: <input type="checkbox" name="disadvantage" value={this.state.disadvantage} onChange={(e) => this.handleChange(e)} />
+        <br/>Reroll numbers up to: <br/>
+          <input type="number" name="reroll" min="0" step="1" value={this.state.reroll} onChange={(e) => this.handleChange(e)} />
+          <br/><nobr data-tip data-for="advantageTip" className="advantage-tooltip">Advantage:</nobr><ReactToolTip id="advantageTip" place="top" effect="solid">
+                Rolls two dice and takes the higher number.
+                </ReactToolTip>&nbsp;
+          <input type="checkbox" name="advantage" value={this.state.advantage} onChange={(e) => this.handleChange(e)} />
+          <br/><nobr data-tip data-for="disadvantageTip" className="disadvantage-tooltip">Disadvantage:</nobr><ReactToolTip id="disadvantageTip" place="top" effect="solid">
+                Rolls two dice and takes the lower number.
+                </ReactToolTip>&nbsp;
+          <input type="checkbox" name="disadvantage" value={this.state.disadvantage} onChange={(e) => this.handleChange(e)} />
+          <br/><nobr data-tip data-for="explodeTip" className="explode-tooltip">Explode:</nobr><ReactToolTip id="explodeTip" place="top" effect="solid">
+                If the highest number is rolled on the die, an extra die is rolled and added to the total.
+                </ReactToolTip>&nbsp;
+              <input type="checkbox" name="explode" value={this.state.explode} onChange={(e) => this.handleChange(e)} />
           <hr/>
       <u>Add Custom Die</u>
           <br/>Number of dice to roll: <br/>
@@ -354,10 +461,21 @@ render () {
           <br/>Number of dice to roll:<br/> <input type="number" name="saveDiceRolled" min="1" step="1" value={this.state.saveDiceRolled} onChange={(e) => this.handleChange(e)} />
           <br/>Die sides:<br/> <input type="number" name="saveRollSides" min="1" step="1" value={this.state.saveRollSides} onChange={(e) => this.handleChange(e)} />
           <br/>Modifier:<br/> <input type="number" name="saveRollModifier" step="1" value={this.state.saveRollModifier} onChange={(e) => this.handleChange(e)} />
-          <br/>Advantage: <input type="checkbox" name="saveRollAdvantage" value={this.state.saveRollAdvantage} onChange={(e) => this.handleChange(e)} />
+          <br/>Reroll numbers up to:<br/> <input type="number" name="saveRollReroll" min="0" step="1" value={this.state.saveRollReroll} onChange={(e) => this.handleChange(e)} />
+          <br/><nobr data-tip data-for="advantageTip" className="advantage-tooltip">Advantage:</nobr><ReactToolTip id="advantageTip" place="top" effect="solid">
+                Rolls two dice and takes the higher number.
+                </ReactToolTip>&nbsp;
+                <input type="checkbox" name="saveRollAdvantage" value={this.state.saveRollAdvantage} onChange={(e) => this.handleChange(e)} />
           {this.state.saveRollAdvantage}
-          <br/>Disadvantage: <input type="checkbox" name="saveRollDisadvantage" value={this.state.saveRollDisadvantage} onChange={(e) => this.handleChange(e)} />
+          <br/><nobr data-tip data-for="disadvantageTip" className="disadvantage-tooltip">Disadvantage:</nobr><ReactToolTip id="disadvantageTip" place="top" effect="solid">
+                Rolls two dice and takes the lower number.
+                </ReactToolTip>&nbsp;
+                 <input type="checkbox" name="saveRollDisadvantage" value={this.state.saveRollDisadvantage} onChange={(e) => this.handleChange(e)} />
           {this.state.saveRollDisadvantage}
+          <br/><nobr data-tip data-for="explodeTip" className="explode-tooltip">Explode:</nobr><ReactToolTip id="explodeTip" place="top" effect="solid">
+                If the highest number is rolled on the die, an extra die is rolled and added to the total.
+                </ReactToolTip> &nbsp; <input type="checkbox" name="saveRollExplode" value={this.state.saveRollExplode} onChange={(e) => this.handleChange(e)} />
+          {this.state.saveRollExplode}
         </label>
 
         <br/>

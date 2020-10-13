@@ -75,3 +75,13 @@ td{
   min-width:50px;
   max-width:50px;
 }
+
+.explode-tooltip{
+  border-bottom: 1px dotted black;
+}
+.advantage-tooltip{
+  border-bottom: 1px dotted black;
+}
+.disadvantage-tooltip{
+  border-bottom: 1px dotted black;
+}
