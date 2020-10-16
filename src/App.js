@@ -152,8 +152,7 @@ for(let i = 0; i < this.state.characters.length; i++)
 
 resetHistory = () =>{
   this.setState({
-    history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": Date.now()}],
-  })
+    history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": 0, "label": "My d20 Roll", advantage: "advantage", advantageRolls: "1, 1"}],  })
 }
 
 getRandomInt(max) {
@@ -185,8 +184,9 @@ diceRoll = (event, max, diceRolled, mod, advantage, label, explode, reroll, disa
   let roll3;
   let roll4;
   let advHistoryArray = [];
-    let i = 0;
-    while (i < diceRolled) {
+  let i = 0;
+    
+  while (i < diceRolled) {
       roll1 = this.getRandomInt(max);
       roll2 = this.getRandomInt(max);
         if (advantage){
@@ -200,19 +200,13 @@ diceRoll = (event, max, diceRolled, mod, advantage, label, explode, reroll, disa
             roll3 = roll2;
             roll4 = roll1;
           } else { roll3 = roll1; roll4 = roll2;  }
-          } else {
-            roll3 = roll1; roll4 = roll2;
-          }
-          console.log("before reroll: ", roll3)
+          } else { roll3 = roll1; roll4 = roll2; }
       if (roll3 <= reroll)
-      { 
-        roll3 = this.getRandomInt(max); 
-      }
-      console.log("after reroll: ", roll3)
+      { roll3 = this.getRandomInt(max); }
       diceRolledArray.push(roll3);
       advHistoryArray.push(` ${roll3}, ${roll4}`);
       i++;
-      if (explode === true && roll3 === max) {
+      if (explode == true && roll3 == max) {
         i--;
       }
   }
@@ -285,11 +279,9 @@ saveRoll = () => {
       reroll: this.state.saveRollReroll,
       "key": Date.now(),
     }],
-    //addDie: 2,
     saveLabel: "",
-    saveRollReroll: 0,
+    //saveRollReroll: 0,
   })
-  //console.log(this.state.savedRolls)
 }
 
 deleteRoll = (event, current) => {
