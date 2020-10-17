@@ -30,8 +30,7 @@ constructor(props){
     diceRolled: 1,
     history: [{"max": 20, "result": 1, "mod": 0, "diceRolled": 1, "rolledArrayString": "1", "key": 0, "label": "My d20 Roll", advantage: "advantage", advantageRolls: "1, 1"}],
     savedRolls: [{"saveDiceRolled": 2, "sides": 4, "modifier": 2, "label": "Healing Potion"},
-                 {"saveDiceRolled": 1, "sides": 20, "modifier": 5, "label": "Attack", "advantage": "advantage"},
-                 {"saveDiceRolled": 10, "sides": 4, "modifier": 0, "label": "Reroll 1s", "advantage": "", reroll: 1,}],
+                 {"saveDiceRolled": 1, "sides": 20, "modifier": 5, "label": "Attack", "advantage": "advantage"}],
     label:"",
     saveLabel: "",
     saveDiceRolled: 1,
@@ -206,6 +205,7 @@ diceRoll = (event, max, diceRolled, mod, advantage, label, explode, reroll, disa
       diceRolledArray.push(roll3);
       advHistoryArray.push(` ${roll3}, ${roll4}`);
       i++;
+      // eslint-disable-next-line
       if (explode == true && roll3 == max) {
         i--;
       }
@@ -296,9 +296,9 @@ deleteRoll = (event, current) => {
 renderDice() {
   return this.state.dice.map((current) =>
   <>
-  <Table key={current.key}>
+  <Table >
   <tbody className="text-center">
-      <tr>
+      <tr key={current.key}>
       <td><button className="buttons" onClick={(event) => this.diceRoll(event, current.sides, current.diceRolled, this.state.modifier, this.state.advantage, this.state.label, this.state.explode, this.state.reroll, this.state.disadvantage,)}>{current.diceRolled}d{current.sides}</button></td>
       <td><button className="buttons" onClick={(event) => this.deleteDie(event, current)}>Remove</button></td>
       </tr>
@@ -309,11 +309,13 @@ renderDice() {
 }
 
 showHistory() {
-  return this.state.history.reverse().map((current) =>
+  let history = this.state.history;
+  history = history.sort((a, b) => a.key - b.key)
+  return history.reverse().map((current) =>
   <>
-  <Table key={this.state.history.findIndex(item => item.key === current.key)}>
+  <Table >
     <tbody>
-  <tr>
+  <tr key={current.key}>
     <td >{current.label}</td>
     <td className="td-small">{current.diceRolled}d{current.max}</td>
     <td className="td-small">{current.result}</td>
@@ -335,9 +337,9 @@ scrollToTop = () => {
 showSavedRolls() {
   return this.state.savedRolls.map((current) =>
   <>
-  <Table key={current.key} >
+  <Table >
   <tbody className="fixed-width-columns text-center">
-<tr>
+<tr key={current.key}>
       <td >{current.label}</td>
       <td ><button  className="buttons" onClick={(event) => this.diceRoll(event, current.sides, current.saveDiceRolled, current.modifier, current.advantage, current.label, current.explode, current.reroll)}>{current.saveDiceRolled}d{current.sides} + {current.modifier}</button></td>
       <td >{current.advantage ? "Advantage" : <i>       </i>} {current.disadvantage ? "Disadvantage" : <i>       </i>} {current.explode ? "Explode" : <i>       </i>}</td>
@@ -357,15 +359,7 @@ event.target.name === 'explode' ||
 event.target.name === 'saveRollAdvantage' ||
 event.target.name === 'saveRollDisadvantage' ||
 event.target.name === 'saveRollExplode'
-){
-    //console.log("trig if, advantage in state is: ", this.state.saveRollAdvantage);    
-    //console.log("trig if, disadvantage in state is: ", this.state.saveRollDisadvantage);
-    //console.log("trig if, explode in state is: ", this.state.saveRollExplode);
-    newState[event.target.name] = !this.state[event.target.name];
-    //console.log("trig if, advantage in state is: ", this.state.saveRollAdvantage);    
-    //console.log("trig if, disadvantage in state is: ", this.state.saveRollDisadvantage);
-    //console.log("trig if, explode in state is: ", this.state.saveRollExplode);
-}
+){ newState[event.target.name] = !this.state[event.target.name]; }
 else { newState[event.target.name] = event.target.value }
   this.setState(newState)
 }
